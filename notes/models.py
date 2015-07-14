@@ -64,3 +64,24 @@ class SearchQuery(models.Model):
 
     class Meta:
         ordering = ('date_time_queried', )
+
+
+class Source(models.Model):
+    ''' Sources for DataPoints and Notes '''
+    url            = models.CharField(max_length=255)
+    found_date     = models.DateTimeField(auto_now_add=True)
+    last_edit_date = models.DateTimeField(auto_now=True)
+    title          = models.CharField(max_length=30)
+
+class Tag(models.Model):
+    ''' Tagging for Notes, DataPoints and Sources '''
+    tag           = models.CharField(max_length=16)
+    creation_date = models.DateTimeField(auto_now_add=True)
+
+    notes         = models.ForeignKey(Note)
+    data_points   = models.ForeignKey(DataPoint)
+    sources       = models.ForeignKey(Source)
+    
+    
+    
+    
