@@ -1,1 +1,3 @@
 togoogleenv/*
+*.pyc
+staticFiles
