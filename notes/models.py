@@ -11,8 +11,8 @@ class Note(models.Model):
     last_edit_date_time = models.DateTimeField(auto_now=True)
     private             = models.BooleanField()
     
-    owner               = models.ForeignKey(User)
-    reviewers           = models.ManyToManyField(User)   
+    owner               = models.ForeignKey(User, null=True)
+    reviewers           = models.ManyToManyField(User, related_name='note_reviewers')   
 
     def __str__(self):
         return self.title
@@ -37,8 +37,8 @@ class DataPoint(models.Model):
     is_factual          = models.BooleanField()
     private             = models.BooleanField()
 
-    owner               = models.ForeignKey('users.User')
-    reviewers           = models.ManyToManyField('users.User')
+    owner               = models.ForeignKey(User, null=True)
+    reviewers           = models.ManyToManyField(User, related_name='data_point_reviewers')
     
     notes               = models.ManyToManyField(Note, related_name='data_points', related_query_name='data_point')
 
@@ -69,7 +69,7 @@ class SearchQuery(models.Model):
 
     note              = models.ForeignKey(Note)
     
-    owner             = models.ForeignKey('users.User')
+    owner             = models.ForeignKey(User, null=True)
 
     @classmethod
     def create(cls, query, owner, note):
