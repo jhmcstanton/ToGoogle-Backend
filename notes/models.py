@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 class Note(models.Model):
@@ -10,8 +11,8 @@ class Note(models.Model):
     last_edit_date_time = models.DateTimeField(auto_now=True)
     private             = models.BooleanField()
     
-    owner               = models.ForeignKey(models.User)
-    reviewers           = models.ManyToMany(models.User)   
+    owner               = models.ForeignKey(User)
+    reviewers           = models.ManyToMany(User)   
 
     def __str__(self):
         return self.title
