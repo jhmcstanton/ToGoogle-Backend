@@ -2,4 +2,3 @@ togoogleenv/*
 *.pyc
 staticFiles
 *~
-togoogle_backend/settings.py
