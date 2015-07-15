@@ -10,18 +10,15 @@ class Note(models.Model):
     last_edit_date_time = models.DateTimeField(auto_now=True)
     private             = models.BooleanField()
     
-    ''' We probaby need owners and people allowed to view this at some point, which will likely require a
-     DB migration or rebuild : 
-    # owner =  models.ForeignKey('users.User')
-    # reviewers = models.ManyToMany('users.User')
-    '''    
+    owner               = models.ForeignKey(models.User)
+    reviewers           = models.ManyToMany(models.User)   
 
     def __str__(self):
         return self.title
 
     @classmethod
-    def create(cls, title, summary, private=True):
-        return cls(title=title, summmary=summary, private=private)
+    def create(cls, title, summary, owner, private=True):
+        return cls(title=title, summmary=summary, private=private, owner=user)
 
     def add_tag(self, tag):
         self.tags.add(tag)
@@ -39,10 +36,8 @@ class DataPoint(models.Model):
     is_factual          = models.BooleanField()
     private             = models.BooleanField()
 
-    ''' More user stuff for when we get there
-    # owner = models.ForeignKey('users.User')
-    # reviewers = models.ManyToMany('users.User')
-    '''
+    owner               = models.ForeignKey('users.User')
+    reviewers           = models.ManyToMany('users.User')
     
     notes               = models.ManyToManyField(Note, related_name='data_points', related_query_name='data_point')
 
@@ -50,8 +45,8 @@ class DataPoint(models.Model):
         return self.datum
 
     @classmethod
-    def create(cls, datum, is_factual, private, note):
-        data_point = cls(datum=datum, is_factual=is_factual, private=private)
+    def create(cls, datum, owner, is_factual, private, note):
+        data_point = cls(datum=datum, is_factual=is_factual, private=private, owner=owner)
         data_point.notes_set.add(note)
         return data_point
 
@@ -73,14 +68,11 @@ class SearchQuery(models.Model):
 
     note              = models.ForeignKey(Note)
     
-    '''
-    More user stuff. We'll get there soon.
-    # owner = models.ForeignKey('users.User')
-    '''
+    owner             = models.ForeignKey('users.User')
 
     @classmethod
-    def create(cls, query, note):
-        query = cls(query=query, note=note)
+    def create(cls, query, owner, note):
+        query = cls(query=query, owner=owner, note=note)
         return query
     
     class Meta:
