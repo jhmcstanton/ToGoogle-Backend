@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-from json
+import json
 
 from . import models
 
@@ -10,7 +10,7 @@ def test_view(request):
 
 def save_note(request):
     if request.is_ajax() and request.method == 'POST':
-        note_load = simplejson.loads(request.raw_data)
+        note_load = json.loads(request.raw_data)
         try:
             note = models.Note.create(note_load['title'], note_load['summary'])
             note.save()
