@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import JsonResponse, HttpResponse, HttpResponseError
+from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
 import json
 
 from . import models
@@ -20,8 +20,8 @@ def save_note(request):
                 point = models.DataPoint.create(json_point, False, False, note)
                 point.save()
         except KeyError:
-            return HttpResponseError("Malformed JSON Data")
+            return HttpResponseBadRequest("Malformed JSON Data")
         return HttpResponse("Received note, saved")
-    return HttpResponseError("Incorrect request")
+    return HttpResponseBadRequest("Incorrect request")
 
 
