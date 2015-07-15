@@ -19,6 +19,13 @@ class Note(models.Model):
     def __str__(self):
         return self.title
 
+    @classmethod
+    def create(cls, title, summary, private=True):
+        return cls(title=title, summmary=summary, private=private)
+
+    def add_tag(self, tag):
+        self.tags.add(tag)
+            
     class Meta:
         ordering = ('last_edit_date_time', 'creation_date_time', )
 
@@ -37,11 +44,20 @@ class DataPoint(models.Model):
     # reviewers = models.ManyToMany('users.User')
     '''
     
-    notes               = models.ManyToManyField(Note)
+    notes               = models.ManyToManyField(Note, related_name='data_points', related_query_name='data_point')
 
     def __str__(self):
         return self.datum
 
+    @classmethod
+    def create(cls, datum, is_factual, private, note):
+        data_point = cls(datum=datum, is_factual=is_factual, private=private)
+        data_point.notes_set.add(note)
+        return data_point
+
+    def add_tag(self, tag):
+        self.tags.add(tag)
+    
     class Meta:
         ordering = ('last_edit_date_time', 'creation_date_time', )
 
@@ -62,6 +78,11 @@ class SearchQuery(models.Model):
     # owner = models.ForeignKey('users.User')
     '''
 
+    @classmethod
+    def create(cls, query, note):
+        query = cls(query=query, note=note)
+        return query
+    
     class Meta:
         ordering = ('date_time_queried', )
 
@@ -73,15 +94,35 @@ class Source(models.Model):
     last_edit_date = models.DateTimeField(auto_now=True)
     title          = models.CharField(max_length=30)
 
+    def __str__(self):
+        return self.url
+
+    @classmethod
+    def create(cls, url, title):
+        source = cls(url=url, title=title)
+        return source
+
+    def add_tag(self, tag):
+        self.tags.add(tag)
+
+        
+
 class Tag(models.Model):
     ''' Tagging for Notes, DataPoints and Sources '''
     tag           = models.CharField(max_length=16)
     creation_date = models.DateTimeField(auto_now_add=True)
 
-    notes         = models.ForeignKey(Note)
-    data_points   = models.ForeignKey(DataPoint)
-    sources       = models.ForeignKey(Source)
+    notes         = models.ManyToManyField(Note)
+    data_points   = models.ManyToManyField(DataPoint)
+    sources       = models.ManyToManyField(Source)
     
-    
+    def __str__(self):
+        return tag
+
+    @classmethod
+    def create(cls, tag):
+        return cls(tag=tag)
+
+        
     
     
