@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-from django.utils import simplejson
+from json
 
 from . import models
 
