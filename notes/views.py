@@ -1,7 +1,9 @@
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
 from django.contrib.auth import authenticate
+from django.contrib.auth.decorators import login_required
 import json
+from utils.decorators import allow_CORS, ajax_api_view
 
 from . import models
 
@@ -9,6 +11,7 @@ from . import models
 def test_view(request):
     return JsonResponse({'test':'super_test!'})
 
+@allow_CORS()
 def handle_note(request):
     if request.is_ajax():
         note_load = json.loads(request.raw_data)
@@ -31,18 +34,29 @@ def handle_note(request):
                 for point in note.data_points.all():
                     data_points.append(point.datum)
                     
-                return JsonResponse({'title': note.title,
-                                     'summary': note.summary,
-                                     'data_points': data_points,
-                                     })
+                return JsonResponse({
+                    'success': True,
+                    'title': note.title,                    
+                    'summary': note.summary,
+                    'data_points': data_points,
+                })
+            
             except KeyError:
-                return HttpResponseBadRequest("Malformed JSON Data in GET request")
+                #return HttpResponseBadRequest("Malformed JSON Data in GET request")
+                return JsonResposne({
+                    'success': False,
+                    'error': 'Malformed JSON data in GET request'
+                })
         else:
-            return HttpResponseBadRequest("Unexpected AJAX request")
+            #return HttpResponseBadRequest("Incorrect method in request.")
+            return JsonRequest({
+                'success': False,
+                'error': 'Incorrect method in request, expected GET'
+            })
             
     return HttpResponseBadRequest("Incorrect request")
 
-
+@allow_CORS()
 def list_notes(request):
     '''A simple view that only response to ajax GET requests. Assuming the user can authenticate it will return a list of note titles and relevant dates.''' 
     if request.is_ajax() and request.method == 'GET':
@@ -67,7 +81,7 @@ def list_notes(request):
             
     return HttpResponseBadRequest('Not an ajax call.')
         
-
+@allow_CORS()
 def single_note(request):
     '''A view that lets a user access a single note in it's entirety (READ ONLY)'''
     if request.is_ajax() and request.method == 'GET':
@@ -97,6 +111,7 @@ def single_note(request):
             
     return HttpResponseBadRequest('Not an ajax call or not a GET request')
 
+@allow_CORS()
 def update_single_note(request):
     '''Allows posting of new or updated notes'''
     if request.is_ajax() and request.method == 'POST':
