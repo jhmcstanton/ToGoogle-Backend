@@ -1,0 +1,22 @@
+# Request (only GET)
+
+{
+    'username': String,
+    'password': String,
+    'note_id' : Int,
+    
+}
+
+# Response
+
+{
+    'title': String,
+    'summary': String,
+    'data_points': [     # Arbitrary length
+	{
+	    'datum': String,
+	    'is_factual': Boolean,
+	    'data_point_id': Int
+	}
+    ]
+}

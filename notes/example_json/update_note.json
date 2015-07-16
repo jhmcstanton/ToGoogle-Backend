@@ -1,0 +1,17 @@
+# Request (only POST)
+
+{
+    'username': String,
+    'password': String,
+    'is_new_note': Boolean,
+    'title': String,
+    'summary': String,
+    'data_points': [
+	{
+	    'data_point_id': Int, # if new data point this can be left out, will be caught on back end
+	    'datum': String,	    
+	}
+    ]
+}
+
+# No JSON response

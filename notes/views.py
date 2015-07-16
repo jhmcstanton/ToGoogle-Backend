@@ -55,10 +55,10 @@ def list_notes(request):
         if user is not None and user.is_active:
             notes = []
             for note in models.Note.objects.filter(owner=user):
-                notes.append({note.id:
-                              {'title': note.title,
+                notes.append({'note_id': note.id,
+                               'title': note.title,
                                'creation_date': note.creation_date,
-                               'last_edit_date': note.last_edit_date}
+                               'last_edit_date': note.last_edit_date
                 })
                 
                 return JsonResponse(notes)
@@ -86,10 +86,10 @@ def single_note(request):
         
         data_points = []
         for point in note.data_points.all():
-        data_points.append({'datum': point.datum,
-                            'is_factual': point.is_factual,
-                            'data_point_id': point.id
-        })                
+            data_points.append({'datum': point.datum,
+                                'is_factual': point.is_factual,
+                                'data_point_id': point.id
+            })                
         return JsonResponse({'title': note.title, # Does this need the id returned? Front end should be able to cache that
                              'summary': note.summary,
                              'data_points': data_points,

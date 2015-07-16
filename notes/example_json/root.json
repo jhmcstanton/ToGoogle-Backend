@@ -1,0 +1,16 @@
+# Request (only GET)
+
+{
+    'username': String,
+    'password': String,    
+}
+
+# Response, array is arbitrarily long
+[
+    {
+	'note_id' : Int
+	'title': String,
+	'creation_date': DateTime,
+	'last_edit_date': DateTime,
+    }	
+]
