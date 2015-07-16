@@ -1,0 +1,23 @@
+#ajax_login request (POST ONLY)
+
+{
+    'username': String,
+    'password': String
+}
+
+# ajax_login response
+
+{
+    'success': Boolean,
+    'error'  : String
+}
+
+# ajax_logout request
+
+just the request
+
+# ajax_logout response
+
+{
+    'success': True # always
+}
