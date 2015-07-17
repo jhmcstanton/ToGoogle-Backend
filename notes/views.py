@@ -131,7 +131,7 @@ def update_single_note(request):
                     return json_error_response('Unknown note_id for this user')
             for data_point in payload['data_points']:
                 try: # Edit the datum on an existing note if it exists
-                    pt_to_edit = note.data_points.get(data_point['data_point_id'])
+                    pt_to_edit = note.data_points.get(id=data_point['data_point_id'])
                     pt_to_edit.datum = data_point['datum'] # Could throw a KeyError
                     pt_to_edit.save()
                 except (ObjectDoesNotExist, KeyError): # Make a new note if it could not be found
