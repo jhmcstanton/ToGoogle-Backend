@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 class Note(models.Model):
     ''' Basic note model for holding summaries and thoughts for users, as well as linking to DataPoints'''
 
-    title               = models.CharField(max_length=30)
+    title               = models.CharField(max_length=100)
     summary             = models.TextField(max_length=255)
     creation_date_time  = models.DateTimeField(auto_now_add=True)
     last_edit_date_time = models.DateTimeField(auto_now=True)
@@ -19,7 +19,7 @@ class Note(models.Model):
 
     @classmethod
     def create(cls, title, summary, owner, private=True):
-        return cls(title=title, summmary=summary, private=private, owner=user)
+        return cls(title=title, summary=summary, private=private, owner=owner)
 
     def add_tag(self, tag):
         self.tags.add(tag)
@@ -30,7 +30,7 @@ class Note(models.Model):
 
 class DataPoint(models.Model):
     ''' Holds small bits of data that build up the details of a note'''
-    datum               = models.CharField(max_length=50)
+    datum               = models.CharField(max_length=140)
     creation_date_time  = models.DateTimeField(auto_now_add=True)
     last_edit_date_time = models.DateTimeField(auto_now=True)
     # Not sure if this is useful yet, but adding it anyway
