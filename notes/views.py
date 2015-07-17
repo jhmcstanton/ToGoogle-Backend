@@ -59,7 +59,7 @@ def handle_note(request):
 @allow_CORS()
 def list_notes(request):
     '''A simple view that only response to ajax GET requests. Assuming the user can authenticate it will return a list of note titles and relevant dates.''' 
-    if request.is_ajax() and request.method == 'GET':
+    if request.is_ajax() and request.method == 'POST':
         payload = json.loads(request.raw_data)
         user = None
         try:            
@@ -75,9 +75,9 @@ def list_notes(request):
                                'last_edit_date': note.last_edit_date
                 })
                 
-                return JsonResponse(notes)
-            else:
-                return HttpResponseBadRequest('Unknown user or incorrect password.')
+            return JsonResponse(notes)
+        else:
+            return HttpResponseBadRequest('Unknown user or incorrect password.')
             
     return HttpResponseBadRequest('Not an ajax call.')
         
