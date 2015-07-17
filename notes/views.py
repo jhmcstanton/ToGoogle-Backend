@@ -114,7 +114,7 @@ def single_note(request):
 @csrf_exempt
 @allow_CORS()
 def update_single_note(request):
-    '''Allows posting of new or updated notes'''
+    '''Allows posting of new or updated notes, or deleting a single note'''
     user = None
     if request.method == 'POST':
         payload = load_json(request)
@@ -129,16 +129,40 @@ def update_single_note(request):
                     note = models.Note.objects.filter(owner=user.id).get(id=payload['note_id'])
                 except ObjectDoesNotExist:
                     return json_error_response('Unknown note_id for this user')
-            for data_point in payload['data_points']:
-                try: # Edit the datum on an existing note if it exists
-                    pt_to_edit = note.data_points.get(id=data_point['data_point_id'])
-                    pt_to_edit.datum = data_point['datum'] # Could throw a KeyError
-                    pt_to_edit.save()
+            data_points = payload['data_points']
+            read_only_points = (models.DataPoint.objects.filter(private=False) | \
+                                models.DataPoint.objects.filter(reviewers__id=user.id)).exclude(owner=user.id)
+            for data_point in data_points:
+                try:
+                    data_point_id = data_point['data_point_id']
+                    query_set = read_only_pts.filter(id=data_point_id) 
+                    if query_set.exist(): # add an existing, read only data point to a note (NO EDITING)
+                        note.add(query_set.get(data_point_id))
+                        note.save()
+                    else:
+                        pt_to_edit = note.data_points.get(id=data_point['data_point_id'])
+                        pt_to_edit.datum = data_point['datum'] # Could throw a KeyError
+                        pt_to_edit.save()
                 except (ObjectDoesNotExist, KeyError): # Make a new note if it could not be found
                     note.data_points.create(datum=data_point['datum'], is_factual=False, private=True, owner=user)
             return json_success_response({}) 
         except KeyError:
             return json_error_response('Malformed JSON in note update request')
+    elif request.method == 'DELETE': 
+        payload = load_json(request)
+        user = None
+        note_id = None
+        try:
+            user = quick_authenticate(payload)
+            note_id = payload['note_id']
+        except KeyError:
+            return json_error_response("Malformed JSON in note delete request")
+        try:
+            models.Note.objects.filter(owner=user).get(id=note_id).delete()
+            return json_success_response({})
+        except ObjectDoesNotExist:
+            return json_error_response('Unknown user or incorrect note_id')
+        
     return HttpResponseBadRequest('Not an ajax call or not a POST request')
 
 
