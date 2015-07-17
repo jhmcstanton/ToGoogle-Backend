@@ -135,9 +135,9 @@ def update_single_note(request):
             for data_point in data_points:
                 try:
                     data_point_id = data_point['data_point_id']
-                    query_set = read_only_pts.filter(id=data_point_id) 
-                    if query_set.exist(): # add an existing, read only data point to a note (NO EDITING)
-                        note.add(query_set.get(data_point_id))
+                    query_set = read_only_points.filter(id=data_point_id) 
+                    if query_set.exists(): # add an existing, read only data point to a note (NO EDITING)
+                        note.data_points.add(query_set.get(id=data_point_id))
                         note.save()
                     else:
                         pt_to_edit = note.data_points.get(id=data_point['data_point_id'])
