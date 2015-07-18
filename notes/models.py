@@ -62,18 +62,18 @@ class SearchQuery(models.Model):
     ''' 
     Literally just a model to hold previous search queries. PRETTY SWEET.
     Each Note can have many SearchQuery's, and each SearchQuery is treated
-    as immutable with only one Note.
+    as immutable with only one Note. Basically, users can have their own queries stored for them.
     '''
     query = models.CharField(max_length=255)
-    date_time_queried = models.DateTimeField(auto_now_add=True)
+    date_time_queried = models.DateTimeField(auto_now_add=True) 
 
-    note              = models.ForeignKey(Note)
+    note              = models.ForeignKey(Note) 
     
-    owner             = models.ForeignKey(User, null=True)
+    # owner             = models.ForeignKey(User, null=True) # this seems like an unncessary field
 
     @classmethod
-    def create(cls, query, owner, note):
-        query = cls(query=query, owner=owner, note=note)
+    def create(cls, query, note):
+        query = cls(query=query, note=note)
         return query
     
     class Meta:
