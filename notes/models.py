@@ -12,7 +12,9 @@ class Note(models.Model):
     private             = models.BooleanField()
     
     owner               = models.ForeignKey(User, null=True)
-    reviewers           = models.ManyToManyField(User, related_name='note_reviewers')   
+    reviewers           = models.ManyToManyField(User, related_name='note_reviewers')
+
+    similar_notes       = models.ManyToManyField('self', related_name='similar_notes')
 
     def __str__(self):
         return self.title
@@ -41,6 +43,8 @@ class DataPoint(models.Model):
     reviewers           = models.ManyToManyField(User, related_name='data_point_reviewers')
     
     notes               = models.ManyToManyField(Note, related_name='data_points', related_query_name='data_point')
+
+    similar_data_points = models.ManyToManyField('self', related_name='similar_data_points')
 
     def __str__(self):
         return self.datum
