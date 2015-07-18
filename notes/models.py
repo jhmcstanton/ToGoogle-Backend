@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from utils.utils import relevance
+from .config import MIN_RELEVANCE
 
 # Create your models here.
 class Note(models.Model):
@@ -25,6 +27,24 @@ class Note(models.Model):
 
     def add_tag(self, tag):
         self.tags.add(tag)
+
+    def add_similar_notes(self):
+        '''Marks other notes as similar if they have similar tags, based on the relevance score. 
+           DISREGARDS IF THE USER IS ALLOWED TO SEE THE NOTE, ALL NOTES MUST BE CHECKED BEFORE DISPLAYING 
+           WHENEVER PRIVACY FEATURES ARE ADDED.'''
+
+        # This is a super expensive operation (N^3), so we need to be careful with this
+        tags = self.tag_set.all()
+        for tag in tags:
+            for note in tag.notes.exclude(id=self.id): # be careful no to add this note to itself
+                if not self.similar_notes.filter(id=note.id).exists() and relevance(tags, note.tag_set.all()) >= MIN_RELEVANCE:                    
+                    self.similar_notes.add(note)
+                    for chained_note in note.similar_notes.exclude(id=self.id): # be careful to not add this note to itself
+                        if not self.similar_notes.filter(id=chained_note.id).exists():                            
+                            self.similar_notes.add(chained_note)
+            
+        
+        
             
     class Meta:
         ordering = ('last_edit_date_time', 'creation_date_time', )
@@ -57,6 +77,17 @@ class DataPoint(models.Model):
 
     def add_tag(self, tag):
         self.tags.add(tag)
+
+    def add_similar_data_points(self):
+        ''' Adds related data points based upon tags (no NLP performed yet). Does NOT check if user has access to the data_point '''
+        tags = self.tag_set.all()
+        for tag in tags:
+            for data_point in tag.data_points.exclude(id=self.id):
+                if not self.similar_data_points.filter(id=data_point.id).exists() and relevance(tags, data_point.tag_set.all()):
+                    self.similar_data_points.add(data_point)
+                    for chained_point in data_point.similar_data_points.exclude(id=self.id):
+                        if not self.similar_data_points.filter(id=data_point.id).exists() and relevance(tags, chained_point.tag_set.all()):
+                            self.similar_data_points.add(chained_point)
     
     class Meta:
         ordering = ('last_edit_date_time', 'creation_date_time', )
@@ -114,12 +145,11 @@ class Tag(models.Model):
     sources       = models.ManyToManyField(Source)
     
     def __str__(self):
-        return tag
+        return self.tag
 
     @classmethod
     def create(cls, tag):
         return cls(tag=tag)
 
-        
     
     
