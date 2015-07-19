@@ -9,14 +9,22 @@
 
 # Response
 
+
 {
     'title': String,
     'summary': String,
-    'data_points': [     # Arbitrary length
+    # Arbitrary length
+    'data_points': [     
 	{
 	    'datum': String,
 	    'is_factual': Boolean,
-	    'data_point_id': Int
+	    'data_point_id': Int,
+	    'tags': [
+		'tag': String
+	    ]
 	}
+    ],
+    'tags': [
+	'tag': String
     ]
 }

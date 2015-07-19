@@ -99,14 +99,17 @@ def single_note(request):
 
         data_points = []
         for point in note.data_points.all():
+            
             data_points.append({'datum': point.datum,
                                 'is_factual': point.is_factual,
-                                'data_point_id': point.id
-            })                
+                                'data_point_id': point.id,
+                                'tags': list(map(lambda t: t.tag, point.tag_set.all()))
+            })  
         return json_success_response({'title': note.title, # Does this need the id returned? Front end should be able to cache that
                                       'note_id': note.id,
                                       'summary': note.summary,
                                       'data_points': data_points,
+                                      'tags': list(map(lambda t: t.tag, note.tag_set.all()))
         })                       
             
     return HttpResponseBadRequest('Not an ajax call or not a GET request')
