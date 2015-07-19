@@ -11,7 +11,22 @@
 	    'data_point_id': Int, # if new data point this can be left out, will be caught on back end
 	    'datum': String,	    
 	}
-    ]
+    ],
+# The rest is not exposed in the view, but is safe to add to the request now (and tables are ready)
+    'queries': [
+	'query': String
+    ],
+    'tags': [
+	'tag': String
+    ],
+    'sources': [
+	'url': String,
+	'title': String #Do we need this?
+    ]    
 }
 
 # No JSON response
+{
+    'success': Boolean,
+    'error'  : String
+}
