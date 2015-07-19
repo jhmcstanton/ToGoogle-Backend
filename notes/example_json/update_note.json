@@ -1,4 +1,4 @@
-# Request (only POST)
+# Request (only POST and DELETE)
 
 {
     'username': String,

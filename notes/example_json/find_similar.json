@@ -1,0 +1,30 @@
+# Request (only POST)
+
+{
+    'username': String,
+    'password': String,
+    'note_id' : Int,
+    'return_similar_notes': Boolean,
+    'return_similar_data_points': Boolean
+}
+
+# Response
+
+{
+    'success': Boolean,
+    'error': String,
+    'similar_notes': [
+	{
+	    'note_id': Int,
+	    'title': String
+	}
+    ]
+    'similar_data_points': [
+	{ 
+	    'data_point_id': Int,
+	    'datum': String,
+	    'is_factual': Boolean
+	}
+    ]
+    
+}

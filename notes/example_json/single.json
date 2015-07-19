@@ -1,4 +1,4 @@
-# Request (only GET)
+# Request (only POST)
 
 {
     'username': String,

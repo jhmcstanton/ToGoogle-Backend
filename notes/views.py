@@ -66,7 +66,7 @@ def list_notes(request):
             return HttpResonseBadRequest("Username or password missing in request.")
         if user is not None and user.is_active:
             notes = []
-            for note in models.Note.objects.filter(owner=user):
+            for note in user.note_set.all(): #models.Note.objects.filter(owner=user):
                 notes.append({'note_id': note.id,
                                'title': note.title,
                                'creation_date': note.creation_date_time,
@@ -93,7 +93,7 @@ def single_note(request):
         
         note = None
         try:
-            note = models.Note.objects.filter(owner=user.id).get(id=payload['note_id'])
+            note = user.note_set.get(id=payload['note_id']) #models.Note.objects.filter(owner=user.id).get(id=payload['note_id'])
         except ObjectDoesNotExist:
             return json_error_response('Unknown note id for this user')
 
@@ -129,7 +129,7 @@ def update_single_note(request):
                 note.save()
             else:
                 try:
-                    note = models.Note.objects.filter(owner=user.id).get(id=payload['note_id'])
+                    note = user.note_set.get(id=payload['note_id']) #models.Note.objects.filter(owner=user.id).get(id=payload['note_id'])
                 except ObjectDoesNotExist:
                     return json_error_response('Unknown note_id for this user')
             data_points = payload['data_points']
@@ -161,13 +161,57 @@ def update_single_note(request):
         except KeyError:
             return json_error_response("Malformed JSON in note delete request")
         try:
-            models.Note.objects.filter(owner=user).get(id=note_id).delete()
+            user.note_set.get(id=note_id) 
             return json_success_response({})
         except ObjectDoesNotExist:
             return json_error_response('Unknown user or incorrect note_id')
         
     return HttpResponseBadRequest('Not an ajax call or not a POST request')
 
+@csrf_exempt
+@allow_CORS()
+def find_similar(request):
+    '''Finds similar notes, datapoints and sources for whatever note is provided'''
+    if request.method == 'POST':
+        try:
+            payload = load_json(request)
+            user = quick_authenticate(payload)
+            note_id = payload['note_id']
+            note = user.note_set.get(id=note_id) #models.Note.objects.filter(owner=user.id).get(id=note_id)
+        except KeyError:
+            return json_error_response('Malformed json in find_similar request')
+        except ObjectDoesNotExist:
+            return json_error_response('Unknown note_id for this user')
+        note.add_similar_notes()
+        for data_point in note.data_points.all():
+            data_point.add_similar_data_points()
+            
+        # Need to add source.find_similar here whenever a) sources are used and b) the method is created
+        try: # buildup return results
+            similar_notes = []
+            similar_data_points = []
+            if payload['return_similar_notes']:
+                for note in note.similar_notes.all():
+                    similar_notes.append({
+                        'note_id': note.id,
+                        'title': note.title,
+                    })
+            if payload['return_similar_data_points']:
+                for data_point in note.data_points.all():
+                    for sim_pt in data_point.similar_data_points.all():
+                        similar_data_points.append({
+                            'data_point_id': sim_pt.id,
+                            'datum': sim_pt.datum,
+                            'is_factual': sim_pt.is_factual
+                        })
+            return json_success_response({
+                'similar_notes' : similar_notes,
+                'similar_data_points': similar_data_points
+                })        
+        except KeyError:
+            return json_error_response('Found similar notes, BUT not sure if similar_notes or similar_data_points are needed (none returned)')
+                
+    return HttpResponseBadRequest('Not an ajax request or not a POST request')
 
 def quick_authenticate(payload):
     return authenticate(username=payload['username'], password=payload['password'])
