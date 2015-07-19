@@ -18,6 +18,8 @@ class Note(models.Model):
 
     similar_notes       = models.ManyToManyField('self', related_name='similar_notes')
 
+    last_analyzed       = models.DateTimeField(auto_now_add=True) # Used by analytics models 
+
     def __str__(self):
         return self.title
 
@@ -60,11 +62,13 @@ class DataPoint(models.Model):
     private             = models.BooleanField()
 
     owner               = models.ForeignKey(User, null=True)
-    reviewers           = models.ManyToManyField(User, related_name='data_point_reviewers')
+    reviewers           = models.ManyToManyField(User, related_name='data_point_reviewers')    
     
     notes               = models.ManyToManyField(Note, related_name='data_points', related_query_name='data_point')
 
     similar_data_points = models.ManyToManyField('self', related_name='similar_data_points')
+
+    last_analyzed       = models.DateTimeField(auto_now_add=True) # Used by analytics models 
 
     def __str__(self):
         return self.datum
