@@ -16,7 +16,7 @@ def test_view(request):
     return JsonResponse({'test':'super_test!'})
 
 @csrf_exempt
-@allow_CORS()
+# @allow_CORS()
 def handle_note(request): # Not currently in use, and not necessary any more
     if request.is_ajax():
         note_load = load_json(request)
@@ -54,7 +54,7 @@ def handle_note(request): # Not currently in use, and not necessary any more
     return HttpResponseBadRequest("Incorrect request")
 
 @csrf_exempt
-@allow_CORS()
+# @allow_CORS()
 def list_notes(request):
     '''A simple view that only response to ajax GET requests. Assuming the user can authenticate it will return a list of note titles and relevant dates.''' 
     if request.method == 'POST':
@@ -80,7 +80,7 @@ def list_notes(request):
     return HttpResponseBadRequest('Not POST or Not an ajax call.')
         
 @csrf_exempt
-@allow_CORS()
+# @allow_CORS()
 def single_note(request):
     '''A view that lets a user access a single note in it's entirety (READ ONLY)'''
     if request.method == 'POST':
@@ -115,7 +115,7 @@ def single_note(request):
     return HttpResponseBadRequest('Not an ajax call or not a GET request')
 
 @csrf_exempt
-@allow_CORS()
+# @allow_CORS()
 def update_single_note(request):
     '''Allows posting of new or updated notes, or deleting a single note'''
     user = None
@@ -169,7 +169,7 @@ def update_single_note(request):
     return HttpResponseBadRequest('Not an ajax call or not a POST request')
 
 @csrf_exempt
-@allow_CORS()
+# @allow_CORS()
 def find_similar(request):
     '''Finds similar notes, datapoints and sources for whatever note is provided'''
     if request.method == 'POST':
