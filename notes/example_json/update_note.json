@@ -9,7 +9,10 @@
     'data_points': [
 	{
 	    'data_point_id': Int, # if new data point this can be left out, will be caught on back end
-	    'datum': String,	    
+	    'datum': String,
+	    'tags': [
+		'tag': String
+	    ]
 	}
     ],
 # The rest is not exposed in the view, but is safe to add to the request now (and tables are ready)

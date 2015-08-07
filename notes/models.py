@@ -120,11 +120,13 @@ class SearchQuery(models.Model):
 
 
 class Source(models.Model):
-    ''' Sources for DataPoints and Notes '''
+    ''' Sources for DataPoints. Notes can access these sources through their related DataPoints'''
     url            = models.CharField(max_length=255)
     found_date     = models.DateTimeField(auto_now_add=True)
     last_edit_date = models.DateTimeField(auto_now=True)
     title          = models.CharField(max_length=30)
+    data_point     = models.OneToOneField(DataPoint)
+    
 
     def __str__(self):
         return self.url
@@ -135,7 +137,7 @@ class Source(models.Model):
         return source
 
     def add_tag(self, tag):
-        self.tags.add(tag)
+        self.tag_set.add(tag)
 
         
 
